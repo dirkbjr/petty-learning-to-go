@@ -3,7 +3,7 @@
 
 //Provide basic statistics on car sales for traditional U.S. muscle cars
 //I felt like doing something different than the dog years example in the course syllabus :-)
-package main
+package petty-learning-to-go
 
 import (
 	"encoding/json"
@@ -30,7 +30,7 @@ type carModelSales struct {
 
 var allCars []carModelSales
 
-func main() {
+func petty-learning-to-go() {
 	var carModel, fullName, carSalesOut string
 	var modelYear string //I might change this to int in the future
 
