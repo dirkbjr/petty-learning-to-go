@@ -10,27 +10,42 @@ import (
 	"fmt"
 )
 
-//	{"carModelName": "Firebird", "carModelYear": "1996", "carModelSales": "32622"},
-//	{"carModelName": "Firebird", "carModelYear": "1997", "carModelSales": "32524"},
-//	{"carModelName": "Mustang", "carModelYear": "1996", "carModelSales": "122674"},
-//	{"carModelName": "Mustang", "carModelYear": "1997", "carModelSales": "116610"}
-//	]`)
+//For this little test program, the source of data is carsalesbase.com. Model year sales for
+//1996 and 1997 were placed in a slice of bytes, which will be json.UnMarshaled into a Go
+//data structure
+var jsonBlob = []byte(`[
+	{"CarName": "Camaro", "CarYear": "1996", "CarSales": "66866"},
+	{"CarName": "Camaro", "CarYear": "1997", "CarSales": "55973"},
+	{"CarName": "Firebird", "CarYear": "1996", "CarSales": "32622"},
+	{"CarName": "Firebird", "CarYear": "1997", "CarSales": "32524"},
+	{"CarName": "Mustang", "CarYear": "1996", "CarSales": "122674"},
+	{"CarName": "Mustang", "CarYear": "1997", "CarSales": "116610"}
+	]`)
+
+type carModelSales struct {
+	CarName  string
+	CarYear  string
+	CarSales string
+}
+
+var allCars []carModelSales
 
 func main() {
-	var carModel, fullName string
-	var modelYear int
-	//fmt.Println(jsonBlob)
+	var carModel, fullName, carSalesOut string
+	var modelYear string //I might change this to int in the future
+
+	//populateDb function is called to take the slice of bytes and place it into an array of struct
 	populateDb()
 
-	//Input one of four car types, Camaro, Firebird, Mustang
+	//The user inputs one of three car model types, Camaro, Firebird, Mustang
 	fmt.Print("Enter Car Model Name (Camaro | Firebird | Mustang): ")
 	_, err := fmt.Scan(&carModel)
 	if err != nil {
 		panic(err)
 	}
 
-	//Input a specific year, or enter 0 to see all years
-	fmt.Print("Enter a specific Model Year between 1996-1997. Enter 0 for all years: ")
+	//The user inputs either 1996 or 1997, as the year of model sales
+	fmt.Print("Enter a specific Model Year between 1996-1997: ")
 	_, err = fmt.Scan(&modelYear)
 	if err != nil {
 		panic(err)
@@ -45,33 +60,32 @@ func main() {
 	case "Mustang":
 		fullName = "Ford Mustang"
 	}
-	fmt.Println("\t", fullName, "\t\t\t", modelYear)
 
+	fmt.Println("")
+
+	for _, v := range allCars {
+		if v.CarName == carModel {
+			if v.CarYear == modelYear {
+				carSalesOut = v.CarSales
+			}
+		}
+	}
+	//Print out the Full Name of the vehicle, the model year chosen and the total sales for the
+	//specified year
+	fmt.Println("\t", fullName, "\tSales in Model Year ", modelYear, "\t-> ", carSalesOut)
 	fmt.Println("")
 }
 
+//populateDb() function takes the global variable jsonBlob, which is a slice of bytes comprised of
+//json formatted data for the car models and their sales for the specified years. The json.Unmarshal function
+//is called to populate a Go variable allCars, which is an array of struct carModelSales
 func populateDb() {
-
-	var jsonBlob = []byte(`[
-	{"CarName": "Camaro", "CarYear": "1996", "CarSales": "66866"},
-	{"CarName": "Camaro", "CarYear": "1997", "CarSales": "55973"},
-	{"CarName": "Firebird", "CarYear": "1996", "CarSales": "32622"},
-	{"CarName": "Firebird", "CarYear": "1997", "CarSales": "32524"},
-	{"CarName": "Mustang", "CarYear": "1996", "CarSales": "122674"},
-	{"CarName": "Mustang", "CarYear": "1997", "CarSales": "116610"}
-	]`)
-
-	type carModelSales struct {
-		CarName  string
-		CarYear  string
-		CarSales string
-	}
-
-	var allCars []carModelSales
 
 	err := json.Unmarshal(jsonBlob, &allCars)
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-	fmt.Printf("%+v\n", allCars)
+
+	//fmt.Printf("%+v\n", allCars)
+
 }
